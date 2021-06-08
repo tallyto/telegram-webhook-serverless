@@ -1,0 +1,23 @@
+{
+  "compilerOptions": {
+      "target": "ES2019",
+      "module": "commonjs",
+      "sourceMap": true,
+      "removeComments": true,
+      "moduleResolution": "node",
+      "noUnusedLocals": true,
+      "noUnusedParameters": true,
+      "outDir": ".build",
+      "esModuleInterop": true,
+      "resolveJsonModule": true,
+      "experimentalDecorators": true,
+      "emitDecoratorMetadata": true,
+      "typeRoots": ["node_modules/@types", "src/common/types"]
+  },
+  "include": ["./src/**/*.ts", "./test/**/*.ts"],
+  "exclude": [
+      "node_modules",
+      "node_modules/**/*.{j,t}s",
+      "node_modules/@types/**/*.{j,t}s"
+  ]
+}

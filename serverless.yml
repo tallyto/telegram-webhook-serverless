@@ -1,0 +1,76 @@
+service: telegram-webhook-bot
+
+frameworkVersion: "2"
+
+provider:
+  name: aws
+  runtime: nodejs12.x
+  region: us-east-1
+  environment:
+    DYNAMODB_TABLE: ${self:service}-${opt:stage, self:provider.stage}-tarefas
+    TELEGRAM_TOKEN: "1802577378:AAGQvkcVe6KNLkItsHh9mjo5D_yJAmaFAFc"
+  iamRoleStatements:
+    - Effect: Allow
+      Action:
+        - dynamodb:Query
+        - dynamodb:Scan
+        - dynamodb:GetItem
+        - dynamodb:PutItem
+        - dynamodb:UpdateItem
+        - dynamodb:DeleteItem
+        - dynamodb:CreateTable
+        - dynamodb:DescribeTable
+      Resource:
+        - "arn:aws:dynamodb:${opt:region, self:provider.region}:*:table/${self:provider.environment.DYNAMODB_TABLE}"
+        - "arn:aws:dynamodb:${opt:region, self:provider.region}:*:table/${self:provider.environment.DYNAMODB_TABLE}/index/*"
+
+plugins:
+  - serverless-webpack
+  - serverless-plugin-lambda-insights
+
+custom:
+  webpack:
+    webpackConfig: "webpack.config.js" # Name of webpack configuration file
+    includeModules: true # Node modules configuration for packaging
+    packager: "npm" # Packager that will be used to package your external modules
+    excludeFiles: src/**/*.test.js # Provide a glob for files to ignore
+  lambdaInsights:
+    defaultLambdaInsights: true #enables Lambda Insights for all functions
+
+functions:
+  webhook:
+    handler: src/functions/webhook.handler
+    lambdaInsights: true #enables Lambda Insights for this function
+    events:
+      - http:
+          path: v1/webhook
+          method: post
+          cors: true
+
+resources:
+  Resources:
+    TodosDynamoDbTable:
+      Type: "AWS::DynamoDB::Table"
+      DeletionPolicy: Retain
+      Properties:
+        AttributeDefinitions:
+          - AttributeName: id
+            AttributeType: S
+          - AttributeName: chat_id
+            AttributeType: S
+          - AttributeName: timestamps
+            AttributeType: S
+        KeySchema:
+          - AttributeName: id
+            KeyType: HASH
+        GlobalSecondaryIndexes:
+          - IndexName: ChatIdIndex
+            KeySchema:
+              - AttributeName: chat_id
+                KeyType: HASH
+              - AttributeName: timestamps
+                KeyType: RANGE
+            Projection:
+              ProjectionType: "ALL"
+        BillingMode: PAY_PER_REQUEST
+        TableName: ${self:provider.environment.DYNAMODB_TABLE}
