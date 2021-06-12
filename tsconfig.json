@@ -12,7 +12,8 @@
       "resolveJsonModule": true,
       "experimentalDecorators": true,
       "emitDecoratorMetadata": true,
-      "typeRoots": ["node_modules/@types", "src/common/types"]
+      "typeRoots": ["node_modules/@types", "src/common/types"],
+      "strictNullChecks": true
   },
   "include": ["./src/**/*.ts", "./test/**/*.ts"],
   "exclude": [

@@ -26,7 +26,9 @@ provider:
 
 plugins:
   - serverless-webpack
-  - serverless-plugin-lambda-insights
+  - serverless-dynamodb-local
+  - serverless-localstack
+  - serverless-offline
 
 custom:
   webpack:
@@ -36,6 +38,21 @@ custom:
     excludeFiles: src/**/*.test.js # Provide a glob for files to ignore
   lambdaInsights:
     defaultLambdaInsights: true #enables Lambda Insights for all functions
+  localstack:
+    stages:
+      # list of stages for which the plugin should be enabled
+      - local
+    host: http://localhost  # optional - LocalStack host to connect to
+    edgePort: 4566  # optional - LocalStack edge port to connect to
+    autostart: false  # optional - Start LocalStack in Docker on Serverless deploy
+    lambda:
+      # Enable this flag to improve performance
+      mountCode: false
+    docker:
+      # Enable this flag to run "docker ..." commands as sudo
+      sudo: false
+  serverless-offline:
+    httpPort: 3001
 
 functions:
   webhook:
